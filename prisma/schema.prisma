@@ -1,0 +1,144 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  url        = env("DATABASE_URL")
+  provider   = "postgresql"
+  extensions = [pgcrypto]
+}
+
+enum RolePrefix {
+  admin    @map("ADMIN")
+  student  @map("STUDENT")
+  teacher  @map("TEACHER")
+  director @map("DIRECTOR")
+
+  @@map("role_prefix")
+}
+
+model User {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  firstName String?   @map("first_name") @db.VarChar(40)
+  lastName  String?   @map("last_name") @db.VarChar(40)
+  roleId    String    @unique @map("role_id") @db.Uuid()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  role        Role          @relation(fields: [roleId], references: [id])
+  Group       Group[]       @relation("user")
+  GroupObject GroupObject[] @relation("user")
+
+  @@id([id])
+  @@map("user_list")
+}
+
+model Role {
+  id        String     @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  prefix    RolePrefix @default(student) @map("prefix")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime   @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamp(0)
+
+  userId User?
+
+  @@id([id])
+  @@map("user_roles")
+}
+
+model Student {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  userId    String?   @unique @map("student_id") @db.Uuid()
+  groupId   String
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  Grade Grade[] @relation("student")
+
+  @@id([id])
+  @@map("students")
+}
+
+model Group {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  groupName String    @map("group_name") @db.VarChar(50)
+  capacity  Int       @map("capacity")
+  teacherId String    @map("teacher_id") @db.Uuid()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  teacher     User          @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  GroupObject GroupObject[] @relation("group")
+
+  @@id([id])
+  @@map("groups")
+}
+
+model Object {
+  id          String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  name        String    @map("name") @db.VarChar(20)
+  description String    @map("description") @db.Text()
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt    DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt   DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  GroupObject GroupObject[] @relation("object")
+
+  @@id([id])
+  @@map("objects")
+}
+
+model GroupObject {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  groupId   String    @map("group_id") @db.Uuid()
+  objectId  String    @map("object_id") @db.Uuid()
+  teacherId String    @map("teacher_id") @db.Uuid()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  group   Group  @relation("group", fields: [groupId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  object  Object @relation("object", fields: [objectId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  teacher User   @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+  @@id([id])
+  @@map("groupObjects")
+}
+
+model Assessment {
+  id            String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  groupObjectId String    @map("group_object_id") @db.Uuid()
+  startDate     DateTime  @map("start_date") @db.Timestamp(0)
+  endDate       DateTime  @map("end_date") @db.Timestamp(0)
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt      DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  grade Grade[] @relation("assessment")
+
+  @@id([id])
+  @@map("assessments")
+}
+
+model Grade {
+  id           String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  studentId    String    @map("student_id") @db.Uuid()
+  assessmentId String    @map("assessment_id") @db.Uuid()
+  grade        Int       @map("grade") @db.Integer()
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt     DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt    DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  assessment Assessment @relation("assessment", fields: [assessmentId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  student    Student    @relation("student", fields: [studentId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+  @@id([id])
+  @@map("grades")
+}
