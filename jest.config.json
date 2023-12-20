@@ -1,0 +1,18 @@
+{
+  "preset": "ts-jest",
+  "verbose": true,
+  "rootDir": "./",
+  "testMatch": ["**/*spec.ts"],
+  "testEnvironment": "node",
+  "moduleNameMapper": {
+    "^@enums": "<rootDir>/enums",
+    "^@clients": "<rootDir>/clients",
+    "^@configs": "<rootDir>/configs",
+    "^@helpers": "<rootDir>/helpers",
+    "^@modules": "<rootDir>/modules",
+    "^@validators": "<rootDir>/validators"
+  },
+  "moduleFileExtensions": ["ts", "js", "json"],
+  "coverageDirectory": "./coverage",
+  "collectCoverageFrom": ["**/*.ts"]
+}
