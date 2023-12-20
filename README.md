@@ -1,4 +1,4 @@
-# Name Of IT
+# Learning Management System
 
 ## Getting started
 
