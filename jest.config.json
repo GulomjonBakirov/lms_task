@@ -6,11 +6,13 @@
   "testEnvironment": "node",
   "moduleNameMapper": {
     "^@enums": "<rootDir>/enums",
+    "^@guards": "<rootDir>/guards",
     "^@clients": "<rootDir>/clients",
     "^@configs": "<rootDir>/configs",
     "^@helpers": "<rootDir>/helpers",
     "^@modules": "<rootDir>/modules",
-    "^@validators": "<rootDir>/validators"
+    "^@validators": "<rootDir>/validators",
+    "^@decorators": "<rootDir>/decorators"
   },
   "moduleFileExtensions": ["ts", "js", "json"],
   "coverageDirectory": "./coverage",

@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core'
 import { ConfigService } from '@nestjs/config'
-import { AppModule } from './app.module'
-// import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
+import { ValidationPipe } from '@nestjs/common'
 import { SwaggerBuilder } from './swagger'
+import { AppModule } from './app.module'
+import { HttpExceptionFilter } from './exceptions'
 
 setImmediate(async (): Promise<void> => {
   const app = await NestFactory.create(AppModule)
@@ -10,6 +11,10 @@ setImmediate(async (): Promise<void> => {
   app.setGlobalPrefix('/api/v1', {
     exclude: ['/docs', '/ping'],
   })
+
+  app.useGlobalPipes(new ValidationPipe())
+
+  app.useGlobalFilters(new HttpExceptionFilter())
 
   const config = app.get(ConfigService)
 

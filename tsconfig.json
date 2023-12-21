@@ -7,10 +7,13 @@
     "moduleResolution": "node",
     "paths": {
       "@enums": ["./enums"],
+      "@guards": ["./guards"],
       "@clients": ["./clients"],
+      "@swagger": ["./swagger"],
       "@configs": ["./configs"],
       "@helpers": ["./helpers"],
       "@modules": ["./modules"],
+      "@decorators": ["./decorators"],
       "@validators": ["./validators"],
       "@interceptors": ["./interceptors"]
     },

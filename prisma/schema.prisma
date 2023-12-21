@@ -22,15 +22,18 @@ enum RolePrefix {
 }
 
 model User {
-  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
-  firstName String?   @map("first_name") @db.VarChar(40)
-  lastName  String?   @map("last_name") @db.VarChar(40)
-  roleId    String    @unique @map("role_id") @db.Uuid()
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
+  id        String     @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  firstName String     @map("first_name") @db.VarChar(40)
+  lastName  String?    @map("last_name") @db.VarChar(40)
+  role      RolePrefix @default(student) @map("role")
+  accesses  String[]   @map("user_accesses")
+  email     String     @unique @map("email") @db.VarChar(255)
+  hash      String     @map("password") @db.VarChar(150)
+  hashedRt  String?    @db.VarChar()
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime   @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime?  @map("deleted_at") @db.Timestamp(0)
 
-  role        Role          @relation(fields: [roleId], references: [id])
   Group       Group[]       @relation("user")
   GroupObject GroupObject[] @relation("user")
 
@@ -38,17 +41,15 @@ model User {
   @@map("user_list")
 }
 
-model Role {
-  id        String     @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
-  prefix    RolePrefix @default(student) @map("prefix")
-  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamp(0)
-  editedAt  DateTime   @default(now()) @map("edit_at") @db.Timestamp(0)
-  deletedAt DateTime?  @map("deleted_at") @db.Timestamp(0)
-
-  userId User?
+model Access {
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  prefix    String    @map("prefix") @db.VarChar()
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
   @@id([id])
-  @@map("user_roles")
+  @@map("user_access")
 }
 
 model Student {
