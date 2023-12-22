@@ -26,7 +26,6 @@ model User {
   firstName String     @map("first_name") @db.VarChar(40)
   lastName  String?    @map("last_name") @db.VarChar(40)
   role      RolePrefix @default(student) @map("role")
-  accesses  String[]   @map("user_accesses")
   email     String     @unique @map("email") @db.VarChar(255)
   hash      String     @map("password") @db.VarChar(150)
   hashedRt  String?    @db.VarChar()
@@ -34,33 +33,25 @@ model User {
   editedAt  DateTime   @default(now()) @map("edit_at") @db.Timestamp(0)
   deletedAt DateTime?  @map("deleted_at") @db.Timestamp(0)
 
-  Group       Group[]       @relation("user")
-  GroupObject GroupObject[] @relation("user")
+  Group    Group[]    @relation("user")
+  schedule Schedule[] @relation("user")
+  Student  Student?   @relation("user")
 
   @@id([id])
   @@map("user_list")
 }
 
-model Access {
-  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
-  prefix    String    @map("prefix") @db.VarChar()
-  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
-  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
-
-  @@id([id])
-  @@map("user_access")
-}
-
 model Student {
   id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
-  userId    String?   @unique @map("student_id") @db.Uuid()
-  groupId   String
+  userId    String    @unique @map("student_id") @db.Uuid()
+  groupId   String    @map("group_id") @db.Uuid
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edited_at") @db.Timestamp(0)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
   Grade Grade[] @relation("student")
+  user  User    @relation("user", fields: [userId], references: [id])
+  group Group   @relation("group", fields: [groupId], references: [id])
 
   @@id([id])
   @@map("students")
@@ -75,8 +66,10 @@ model Group {
   editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
-  teacher     User          @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
-  GroupObject GroupObject[] @relation("group")
+  teacher User @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+
+  schedule Schedule[] @relation("group")
+  Student  Student[]  @relation("group")
 
   @@id([id])
   @@map("groups")
@@ -90,17 +83,19 @@ model Object {
   editedAt    DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
   deletedAt   DateTime? @map("deleted_at") @db.Timestamp(0)
 
-  GroupObject GroupObject[] @relation("object")
+  schedule Schedule[] @relation("object")
 
   @@id([id])
   @@map("objects")
 }
 
-model GroupObject {
+model Schedule {
   id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
   groupId   String    @map("group_id") @db.Uuid()
   objectId  String    @map("object_id") @db.Uuid()
   teacherId String    @map("teacher_id") @db.Uuid()
+  startTime DateTime  @map("start_time") @db.Timestamp(0)
+  endTime   DateTime  @map("end_time") @db.Timestamp(0)
   createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
   editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
@@ -110,7 +105,7 @@ model GroupObject {
   teacher User   @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
 
   @@id([id])
-  @@map("groupObjects")
+  @@map("schedule")
 }
 
 model Assessment {
