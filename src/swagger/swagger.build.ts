@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config'
-import { SwaggerModule } from '@nestjs/swagger'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import type { INestApplication } from '@nestjs/common'
 import type { SwaggerDocumentOptions } from '@nestjs/swagger'
 import type { SwaggerConfig } from '@configs'
@@ -10,7 +10,24 @@ export class SwaggerBuilder {
 
     const swagger = config.getOrThrow<SwaggerConfig>('swagger')
 
-    const document = SwaggerModule.createDocument(app, swagger.options, documentOptions)
+    const options = new DocumentBuilder()
+      .setTitle('Learning Management System')
+      .setDescription('The LMS API documention')
+      .setVersion('1.0.0')
+      .addBearerAuth(
+        {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          name: 'JWT',
+          description: 'Enter JWT token',
+          in: 'header',
+        },
+        'jwt',
+      )
+      .build()
+
+    const document = SwaggerModule.createDocument(app, options, documentOptions)
 
     return SwaggerModule.setup(swagger.path, app, document)
   }

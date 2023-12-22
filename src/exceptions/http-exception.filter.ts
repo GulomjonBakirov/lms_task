@@ -16,9 +16,19 @@ export class HttpExceptionFilter implements ExceptionFilter {
     if (exception instanceof Prisma.PrismaClientKnownRequestError) {
       switch (exception.code) {
         case 'P2002':
-          httpStatus = 403
+          httpStatus = 400
           target = exception.message.split(' ')[exception.message.split(' ').length - 1]
           errorMessage = `${target} column is unique`
+          break
+
+        case 'P2003':
+          httpStatus = 400
+          errorMessage = 'Foreign Key error'
+          break
+
+        case 'P2023':
+          httpStatus = 400
+          errorMessage = 'Invalid UUID'
           break
 
         default:
@@ -36,6 +46,8 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
       return
     }
+
+    console.log(exception)
 
     httpStatus = exception.getStatus()
     errorMessage = exception.message

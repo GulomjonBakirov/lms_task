@@ -1,4 +1,5 @@
 export enum HttpMessage {
+  OK = 'Ok',
   CREATED = 'Created',
   CONFLICT = 'Conflict',
   FORBIDDEN = 'Forbidden',

@@ -1,2 +1,2 @@
-export * from './access.enum'
+export * from './roles.enum'
 export * from './http-messages.enum'

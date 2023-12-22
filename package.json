@@ -16,6 +16,7 @@
   "scripts": {
     "fmt": "eslint src --fix && prettier src --write",
     "clean": "rimraf dist",
+    "seed": "ts-node prisma/seed.ts",
     "build": "nest build --config nest.config.json",
     "alias": "tsc-alias --project tsconfig.build.json",
     "start": "nest start --config nest.config.json",
