@@ -3,8 +3,9 @@ import { JwtService } from '@nestjs/jwt'
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '@clients'
-import { LoginDto, SignUpDto } from './dto'
+import { IUser } from '@types'
 import { Tokens } from './type'
+import { LoginDto, SignUpDto } from './dto'
 
 @Injectable()
 export class AuthService {
@@ -73,6 +74,24 @@ export class AuthService {
     })
   }
 
+  // get Me
+  async getMe(userId: string): Promise<IUser> {
+    return this.#_prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        editedAt: true,
+        createdAt: true,
+      },
+    })
+  }
+
   // refresh
   async refreshTokens(userId: string, rt: string): Promise<Tokens> {
     const user = await this.#_prisma.user.findUnique({
@@ -109,7 +128,7 @@ export class AuthService {
         },
         {
           secret: 'at-secret',
-          expiresIn: 60 * 5,
+          expiresIn: 60 * 60,
         },
       ),
       this.#_jwt.signAsync(

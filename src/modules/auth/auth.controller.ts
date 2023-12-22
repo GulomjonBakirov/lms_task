@@ -1,12 +1,31 @@
-import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger'
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, UseGuards } from '@nestjs/common'
-import { InternalServerErrorResponse, BadRequestResponse, ConflictResponse } from '@swagger'
-import { CurrentUser, CurrentUserId, Public } from '@decorators'
+import {
+  ApiBody,
+  ApiTags,
+  ApiSecurity,
+  ApiResponse,
+  ApiOkResponse,
+  ApiConflictResponse,
+  ApiNoContentResponse,
+  ApiForbiddenResponse,
+  ApiBadRequestResponse,
+  ApiUnauthorizedResponse,
+  ApiInternalServerErrorResponse,
+} from '@nestjs/swagger'
+import { Get, Body, Post, Controller, HttpCode, HttpStatus, UseGuards } from '@nestjs/common'
+import {
+  ConflictResponse,
+  ForbiddenResponse,
+  BadRequestResponse,
+  UnauthorizedResponse,
+  InternalServerErrorResponse,
+} from '@swagger'
+import { Public, CurrentUser, CurrentUserId } from '@decorators'
 import { HttpMessage } from '@enums'
 import { RTGuard } from '@guards'
-import { LoginDto, SignUpDto, SignUpRequestDto, SignUpResponseDto } from './dto'
-import { AuthService } from './auth.service'
 import { Tokens } from './type'
+import { AuthService } from './auth.service'
+import { LoginDto, SignUpDto, SignUpResponseDto } from './dto'
+import { IUser } from '@types'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -18,7 +37,7 @@ export class AuthController {
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   @ApiBody({
-    type: SignUpRequestDto,
+    type: SignUpDto,
   })
   @ApiResponse({
     type: SignUpResponseDto,
@@ -48,6 +67,29 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
+  @ApiBody({
+    type: LoginDto,
+  })
+  @ApiOkResponse({
+    type: SignUpResponseDto,
+    description: HttpMessage.OK,
+  })
+  @ApiForbiddenResponse({
+    type: ForbiddenResponse,
+    description: HttpMessage.FORBIDDEN,
+  })
+  @ApiBadRequestResponse({
+    type: BadRequestResponse,
+    description: HttpMessage.BAD_REQUEST,
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorResponse,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  @ApiConflictResponse({
+    type: ConflictResponse,
+    description: HttpMessage.CONFLICT,
+  })
   login(@Body() dto: LoginDto): Promise<Tokens> {
     return this.authService.login(dto)
   }
@@ -57,6 +99,23 @@ export class AuthController {
   @UseGuards(RTGuard)
   @Get('refresh')
   @HttpCode(HttpStatus.OK)
+  @ApiSecurity('jwt')
+  @ApiOkResponse({
+    type: SignUpResponseDto,
+    description: HttpMessage.OK,
+  })
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorResponse,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  @ApiConflictResponse({
+    type: ConflictResponse,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: HttpMessage.UNAUTHORIZED,
+  })
   refreshTokens(@CurrentUserId() userId: string, @CurrentUser('refresh_token') rt: string) {
     return this.authService.refreshTokens(userId, rt)
   }
@@ -64,7 +123,32 @@ export class AuthController {
   // logout
   @Post('logout')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @ApiSecurity('jwt')
+  @ApiNoContentResponse()
+  @ApiInternalServerErrorResponse({
+    type: InternalServerErrorResponse,
+    description: HttpMessage.INTERNAL_SERVER_ERROR,
+  })
+  @ApiConflictResponse({
+    type: ConflictResponse,
+    description: HttpMessage.CONFLICT,
+  })
+  @ApiUnauthorizedResponse({
+    type: UnauthorizedResponse,
+    description: HttpMessage.UNAUTHORIZED,
+  })
   logout(@CurrentUserId() userId: string) {
     this.authService.logout(userId)
+  }
+
+  @Get('/me')
+  @HttpCode(HttpStatus.OK)
+  @ApiSecurity('jwt')
+  // @ApiOkResponse({
+  //   type: SignUpResponseDto,
+  //   description: HttpMessage.OK,
+  // })
+  getMe(@CurrentUserId() userId: string): Promise<IUser> {
+    return this.authService.getMe(userId)
   }
 }
