@@ -22,16 +22,11 @@ $ npx prisma migrate dev
 $ npx prisma db push
 $ npm run seed
 ```
+copy users email and passwords for using login system
 
 ### Documentation on SWAGGER
 
-http://{HOST}:{PORT}/docs
-
-copy users email and passwords for using login system
-
-```bash
-$ pnpm start
-```
+**http://{HOST}:{PORT}/docs**
 
 ### Build the project
 
