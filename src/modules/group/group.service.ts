@@ -1,17 +1,14 @@
-import { UserService } from '@modules'
 import { Injectable, NotFoundException } from '@nestjs/common'
-import { CreateGroupDto } from './dto'
 import { PrismaService } from '@clients'
-import { IGroup } from './type'
+import { CreateGroupDto } from './dto'
+import type { IGroup } from './type'
 
 @Injectable()
 export class GroupService {
   readonly #_prisma: PrismaService
-  readonly #_userService: UserService
 
-  constructor(prisma: PrismaService, userService: UserService) {
+  constructor(prisma: PrismaService) {
     this.#_prisma = prisma
-    this.#_userService = userService
   }
 
   async createGroup(dto: CreateGroupDto): Promise<IGroup> {
@@ -88,29 +85,7 @@ export class GroupService {
     })
   }
 
-  async joinToGroup(groupId: string, studentId: string): Promise<any> {
-    await this.isGroupExist(groupId)
-    await this.#_userService.userExist(studentId)
-
-    const new_student = await this.#_prisma.student.create({
-      data: {
-        groupId: groupId,
-        userId: studentId,
-      },
-    })
-
-    console.log(new_student.id)
-
-    const student = await this.#_prisma.$queryRaw`
-      SELECT s.id, u.first_name as firstName, u.last_name as lastName, u.role, u.email, g.group_name as groupName, s.created_at as createdAt, s.edited_at as editedAt FROM students as s LEFT JOIN user_list as u ON s.student_id = u.id
-        LEFT JOIN groups as g ON s.group_id = g.id WHERE s.id::text = ${new_student.id}`
-
-    return student
-  }
-
   async isGroupExist(id: string): Promise<boolean> {
-    console.log(id)
-
     const group = await this.#_prisma.group.findFirst({
       where: {
         id,

@@ -2,7 +2,6 @@ import {
   ApiBody,
   ApiTags,
   ApiSecurity,
-  ApiResponse,
   ApiOkResponse,
   ApiConflictResponse,
   ApiNoContentResponse,
@@ -22,10 +21,11 @@ import {
 import { Public, CurrentUser, CurrentUserId } from '@decorators'
 import { HttpMessage } from '@enums'
 import { RTGuard } from '@guards'
-import { Tokens } from './type'
 import { AuthService } from './auth.service'
-import { LoginDto, SignUpDto, SignUpResponseDto } from './dto'
-import { IUser } from '@types'
+import { UserResponseDto } from '../user/dto'
+import { LoginDto, SignUpResponseDto } from './dto'
+import type { Tokens } from './type'
+import type { IUser } from '@types'
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -33,35 +33,35 @@ export class AuthController {
   constructor(private authService: AuthService) {}
 
   // signup
-  @Public()
-  @Post('signup')
-  @HttpCode(HttpStatus.CREATED)
-  @ApiBody({
-    type: SignUpDto,
-  })
-  @ApiResponse({
-    type: SignUpResponseDto,
-    status: HttpStatus.CREATED,
-    description: HttpMessage.CREATED,
-  })
-  @ApiResponse({
-    type: BadRequestResponse,
-    status: HttpStatus.BAD_REQUEST,
-    description: HttpMessage.BAD_REQUEST,
-  })
-  @ApiResponse({
-    type: InternalServerErrorResponse,
-    status: HttpStatus.INTERNAL_SERVER_ERROR,
-    description: HttpMessage.INTERNAL_SERVER_ERROR,
-  })
-  @ApiResponse({
-    type: ConflictResponse,
-    status: HttpStatus.CONFLICT,
-    description: HttpMessage.CONFLICT,
-  })
-  signup(@Body() dto: SignUpDto): Promise<Tokens> {
-    return this.authService.signup(dto)
-  }
+  // @Public()
+  // @Post('signup')
+  // @HttpCode(HttpStatus.CREATED)
+  // @ApiBody({
+  //   type: SignUpDto,
+  // })
+  // @ApiResponse({
+  //   type: SignUpResponseDto,
+  //   status: HttpStatus.CREATED,
+  //   description: HttpMessage.CREATED,
+  // })
+  // @ApiResponse({
+  //   type: BadRequestResponse,
+  //   status: HttpStatus.BAD_REQUEST,
+  //   description: HttpMessage.BAD_REQUEST,
+  // })
+  // @ApiResponse({
+  //   type: InternalServerErrorResponse,
+  //   status: HttpStatus.INTERNAL_SERVER_ERROR,
+  //   description: HttpMessage.INTERNAL_SERVER_ERROR,
+  // })
+  // @ApiResponse({
+  //   type: ConflictResponse,
+  //   status: HttpStatus.CONFLICT,
+  //   description: HttpMessage.CONFLICT,
+  // })
+  // signup(@Body() dto: SignUpDto): Promise<Tokens> {
+  //   return this.authService.signup(dto)
+  // }
 
   // login
   @Public()
@@ -144,10 +144,10 @@ export class AuthController {
   @Get('/me')
   @HttpCode(HttpStatus.OK)
   @ApiSecurity('jwt')
-  // @ApiOkResponse({
-  //   type: SignUpResponseDto,
-  //   description: HttpMessage.OK,
-  // })
+  @ApiOkResponse({
+    type: UserResponseDto,
+    description: HttpMessage.OK,
+  })
   getMe(@CurrentUserId() userId: string): Promise<IUser> {
     return this.authService.getMe(userId)
   }

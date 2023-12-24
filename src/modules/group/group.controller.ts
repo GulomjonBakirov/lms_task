@@ -104,15 +104,12 @@ export class GroupController {
   @Get()
   @HttpCode(HttpStatus.OK)
   @Roles(Role.TEACHER, Role.DIRECTOR)
+  @ApiOkResponse({
+    type: CreateGroupResponseDto,
+    status: HttpStatus.OK,
+  })
   getGroups(): Promise<IGroup[]> {
     return this.#_groupService.getGroups()
-  }
-
-  @Post('/student/:studentId')
-  @HttpCode(HttpStatus.OK)
-  @Roles(Role.DIRECTOR)
-  joinToGroup(@Body('groupId') groupId: string, @Param('studentId') studentId: string): Promise<any> {
-    return this.#_groupService.joinToGroup(groupId, studentId)
   }
 
   @Delete('/:id')

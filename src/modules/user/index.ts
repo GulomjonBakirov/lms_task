@@ -1,3 +1,5 @@
 export * from './user.module'
 export * from './user.service'
+export * from './student.service'
 export * from './user.controller'
+export * from './student.controller'

@@ -17,10 +17,21 @@ $ cp .env.example .env
 ### Run the project
 
 ```bash
-$ pnpm start
+$ docker-compose up
+$ npx prisma migrate dev
+$ npx prisma db push
+$ npm run seed
 ```
 
-## Commands
+### Documentation on SWAGGER
+
+http://{HOST}:{PORT}/docs
+
+copy users email and passwords for using login system
+
+```bash
+$ pnpm start
+```
 
 ### Build the project
 
@@ -39,19 +50,6 @@ $ pnpm start:watch
 
 # Run the project in debug mode
 $ pnpm start:debug
-```
-
-### Run the tests
-
-```bash
-# Run the tests
-$ pnpm test
-
-# Run the tests in watch mode
-$ pnpm test:watch
-
-# Run the tests in coverage mode
-$ pnpm test:coverage
 ```
 
 Enjoy!

@@ -1,17 +1,11 @@
 export interface IStudent {
-  group: {
-    groupName: string
-    capacity: number
-  }
-  user: {
-    firstName: string
-    lastName: string
-    email: string
-    role: string
-  }
-  grade: {
-    grade: number
-  }
+  id: string
+  groupname: string
+  groupId: string
+  firstname: string
+  lastname: string
+  email: string
+  role: string
   createdAt: Date
   editedAt: Date
 }

@@ -1,4 +1,6 @@
 export * from './auth'
 export * from './user'
-export * from './health'
 export * from './group'
+export * from './health'
+export * from './object'
+export * from './schedule'

@@ -3,9 +3,9 @@ import { JwtService } from '@nestjs/jwt'
 import { ForbiddenException, Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { PrismaService } from '@clients'
-import { IUser } from '@types'
-import { Tokens } from './type'
 import { LoginDto, SignUpDto } from './dto'
+import type { IUser } from '@types'
+import type { Tokens } from './type'
 
 @Injectable()
 export class AuthService {
@@ -128,7 +128,7 @@ export class AuthService {
         },
         {
           secret: 'at-secret',
-          expiresIn: 60 * 60,
+          expiresIn: this.#_config.get<number>('AT_EXPIRES'),
         },
       ),
       this.#_jwt.signAsync(
@@ -140,11 +140,10 @@ export class AuthService {
         },
         {
           secret: 'rt-secret',
-          expiresIn: 60 * 60 * 24 * 7,
+          expiresIn: this.#_config.get<number>('RT_EXPIRES'),
         },
       ),
     ])
-
     return { access_token: at, refresh_token: rt }
   }
 

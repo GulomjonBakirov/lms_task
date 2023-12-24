@@ -49,9 +49,10 @@ model Student {
   editedAt  DateTime  @default(now()) @map("edited_at") @db.Timestamp(0)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
-  Grade Grade[] @relation("student")
-  user  User    @relation("user", fields: [userId], references: [id])
-  group Group   @relation("group", fields: [groupId], references: [id])
+  grade       GradeAssessment[] @relation("student")
+  gradeObject GradeObject[]     @relation("student")
+  user        User              @relation("user", fields: [userId], references: [id])
+  group       Group             @relation("group", fields: [groupId], references: [id])
 
   @@id([id])
   @@map("students")
@@ -100,30 +101,32 @@ model Schedule {
   editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
   deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
-  group   Group  @relation("group", fields: [groupId], references: [id], onUpdate: NoAction, onDelete: Cascade)
-  object  Object @relation("object", fields: [objectId], references: [id], onUpdate: NoAction, onDelete: Cascade)
-  teacher User   @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  group      Group         @relation("group", fields: [groupId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  object     Object        @relation("object", fields: [objectId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  teacher    User          @relation("user", fields: [teacherId], references: [id], onUpdate: NoAction, onDelete: Cascade)
+  gadeObject GradeObject[] @relation("schedule")
 
   @@id([id])
   @@map("schedule")
 }
 
 model Assessment {
-  id            String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
-  groupObjectId String    @map("group_object_id") @db.Uuid()
-  startDate     DateTime  @map("start_date") @db.Timestamp(0)
-  endDate       DateTime  @map("end_date") @db.Timestamp(0)
-  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
-  editedAt      DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
-  deletedAt     DateTime? @map("deleted_at") @db.Timestamp(0)
+  id        String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  objectId  String    @map("object_id") @db.Uuid()
+  teacherId String    @map("teacher_id") @db.Uuid()
+  startDate DateTime  @map("start_date") @db.Timestamp(0)
+  endDate   DateTime  @map("end_date") @db.Timestamp(0)
+  createdAt DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt  DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt DateTime? @map("deleted_at") @db.Timestamp(0)
 
-  grade Grade[] @relation("assessment")
+  grade GradeAssessment[] @relation("assessment")
 
   @@id([id])
   @@map("assessments")
 }
 
-model Grade {
+model GradeAssessment {
   id           String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
   studentId    String    @map("student_id") @db.Uuid()
   assessmentId String    @map("assessment_id") @db.Uuid()
@@ -136,5 +139,21 @@ model Grade {
   student    Student    @relation("student", fields: [studentId], references: [id], onUpdate: NoAction, onDelete: Cascade)
 
   @@id([id])
-  @@map("grades")
+  @@map("grade_assessment")
+}
+
+model GradeObject {
+  id         String    @default(dbgenerated("GEN_RANDOM_UUID()")) @map("id") @db.Uuid()
+  scheduleId String    @map("schedule_id") @db.Uuid()
+  studentId  String    @map("student_id") @db.Uuid()
+  grade      Int       @map("grade") @db.Integer()
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamp(0)
+  editedAt   DateTime  @default(now()) @map("edit_at") @db.Timestamp(0)
+  deletedAt  DateTime? @map("deleted_at") @db.Timestamp(0)
+
+  schedule Schedule @relation("schedule", fields: [scheduleId], references: [id])
+  student  Student  @relation("student", fields: [studentId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([id])
+  @@map("grade_object")
 }

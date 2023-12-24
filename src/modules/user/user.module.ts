@@ -1,13 +1,15 @@
-import { Module } from '@nestjs/common'
-import { UserService } from './user.service'
-import { UserController } from './user.controller'
+import { Module, forwardRef } from '@nestjs/common'
+import { AuthModule, GroupModule, ScheduleModule } from '@modules'
 import { PrismaModule } from '@clients'
-import { AuthModule } from '@modules'
+import { UserService } from './user.service'
+import { StudentService } from './student.service'
+import { UserController } from './user.controller'
+import { StudentController } from './student.controller'
 
 @Module({
-  imports: [PrismaModule, AuthModule],
-  providers: [UserService],
-  controllers: [UserController],
-  exports: [UserService],
+  imports: [PrismaModule, AuthModule, forwardRef(() => GroupModule), forwardRef(() => ScheduleModule)],
+  providers: [UserService, StudentService],
+  controllers: [UserController, StudentController],
+  exports: [UserService, StudentService],
 })
 export class UserModule {}

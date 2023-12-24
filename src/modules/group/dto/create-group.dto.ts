@@ -1,4 +1,3 @@
-import { randomUUID } from 'crypto'
 import { ApiProperty } from '@nestjs/swagger'
 import { IsNotEmpty, IsNumber, IsString, IsUUID, MaxLength } from 'class-validator'
 
@@ -23,7 +22,7 @@ export class CreateGroupDto {
   @IsUUID()
   @IsNotEmpty()
   @ApiProperty({
-    example: randomUUID(),
+    example: 'Teacher ID',
     required: true,
   })
   teacherId: string
