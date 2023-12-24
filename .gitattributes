@@ -1,0 +1,21 @@
+* text=auto
+
+**/*.md export-ignore
+**/*.sql export-ignore
+**/*.yml export-ignore
+**/*.yaml export-ignore
+**/*.toml export-ignore
+**/*.json export-ignore
+**/*.prisma export-ignore
+
+**/.eslintrc export-ignore
+**/.prettierrc export-ignore
+
+**/.gitignore export-ignore
+**/.dockerignore export-ignore
+**/.eslintignore export-ignore
+**/.prettierignore export-ignore
+
+**/.editorconfig export-ignore
+**/.gitattributes export-ignore
+
